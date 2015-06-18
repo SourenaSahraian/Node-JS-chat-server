@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Suren Chat</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+
+
+<div class="chat">
+    <input type="text" class="chat-name" placeholder="Enter your name">
+
+<!--
+  -->
+
+    <div id='output-messages' class="chat-messages" >
+
+  <!-- <textarea id="output-messages" class="chat-messages" readonly></textarea>-->
+
+
+</div>
+    <textarea class="chat-textarea" placeholder="Type your message"></textarea>
+    <button type="button">send !</button>
+
+    <div class="chat-status">status <span>idle</span></div>
+</div>
+
+<script src="http://127.0.0.1:8080/socket.io/socket.io.js"></script>
+
+<script>
+    (function () {
+
+        console.log('some shit is entered ');
+        var getNode = function (s) {
+            return document.querySelector(s);
+        }
+
+        var text_area = getNode('.chat-textarea');
+        var chat_name = getNode('.chat-name');
+        var chat_message=getNode('.chat-messages');
+        var status=getNode('.chat-status');
+        var defult_status="Idle";
+
+        try {
+            var socket = io.connect('http://127.0.0.1:8080/')
+        }
+        catch (ex) {
+            console.log(ex)
+            throw ex;
+        }
+
+        // all actions happen here
+        if(socket != undefined){
+            console.log('OK');
+            var self=this;
+
+            var output
+
+            //broadcast user messages on the screen
+            socket.on('output',function(data){
+              data.forEach(function(user_message){
+                  console.log('user :',user_message.name, ' message : ',  user_message.message)
+
+                  var para = document.createElement("P");
+                  var t = document.createTextNode('user :' + user_message.name + ' message : '+  user_message.message);
+                  para.appendChild(t);
+                  document.getElementById('output-messages').appendChild(para);
+
+
+
+              })
+            })
+
+
+            text_area.addEventListener('keydown', function(event){
+                var name=chat_name.value;
+                var message= text_area.value;
+                var current_status= status.innerHTML;
+                current_status =  name + 's  fucking typing';
+               if(current_status != defult_status){
+                    var delay= setTimeout(function(){
+                        // do action
+                        current_status=defult_status;
+                        status.innerHTML=message;//current_status;
+                    },2000)
+                }
+                status.innerHTML=current_status;
+                //output data
+
+                // which is a property of the event and contains the numerical value for the key which is pressed
+                if(event.which == 13  && event.shiftKey == false){
+                    socket.emit('input', {'name':name ,
+                        'message': message })
+                    console.log('send');
+
+                    socket.emit('output',{})
+
+                }
+
+
+            })
+        }
+
+    })()
+</script>
+
+
+</body>
+</html>
+<!--socket.emit('input',{"name":"Soorena",
+"message":"Hello dude"})
