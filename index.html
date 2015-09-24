@@ -13,7 +13,6 @@
 
 <!--
   -->
-
     <div id='output-messages' class="chat-messages" >
 
   <!-- <textarea id="output-messages" class="chat-messages" readonly></textarea>-->
@@ -31,7 +30,6 @@
 <script>
     (function () {
 
-        console.log('some shit is entered ');
         var getNode = function (s) {
             return document.querySelector(s);
         }
@@ -61,17 +59,13 @@
             socket.on('output',function(data){
               data.forEach(function(user_message){
                   console.log('user :',user_message.name, ' message : ',  user_message.message)
-
                   var para = document.createElement("P");
                   var t = document.createTextNode('user :' + user_message.name + ' message : '+  user_message.message);
                   para.appendChild(t);
                   document.getElementById('output-messages').appendChild(para);
 
-
-
               })
             })
-
 
             text_area.addEventListener('keydown', function(event){
                 var name=chat_name.value;
@@ -82,7 +76,7 @@
                     var delay= setTimeout(function(){
                         // do action
                         current_status=defult_status;
-                        status.innerHTML=message;//current_status;
+                        status.innerHTML=current_status;  // message
                     },2000)
                 }
                 status.innerHTML=current_status;
@@ -93,7 +87,6 @@
                     socket.emit('input', {'name':name ,
                         'message': message })
                     console.log('send');
-
                     socket.emit('output',{})
 
                 }
